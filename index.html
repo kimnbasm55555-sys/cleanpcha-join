@@ -1820,6 +1820,36 @@ dts.forEach(d=>d.addEventListener('toggle',()=>{
   if(d.open) dts.forEach(o=>{ if(o!==d) o.open=false; });
 }));
 
+
+/* 연락처 자동 하이픈 — 010-0000-0000 */
+function hyphenTel_(v){
+  var d = String(v||'').replace(/[^0-9]/g,'').slice(0,11);
+  if(d.startsWith('02')){                       // 서울 지역번호
+    if(d.length<3) return d;
+    if(d.length<7) return d.slice(0,2)+'-'+d.slice(2);
+    if(d.length<10) return d.slice(0,2)+'-'+d.slice(2,5)+'-'+d.slice(5,9);
+    return d.slice(0,2)+'-'+d.slice(2,6)+'-'+d.slice(6,10);
+  }
+  if(d.length<4) return d;
+  if(d.length<8) return d.slice(0,3)+'-'+d.slice(3);
+  if(d.length<11) return d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6,10);
+  return d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7,11);
+}
+function bindTel_(id){
+  var el = document.getElementById(id);
+  if(!el) return;
+  el.setAttribute('inputmode','numeric');
+  el.setAttribute('maxlength','13');
+  el.addEventListener('input', function(){
+    var s = this.selectionStart, before = this.value.length;
+    this.value = hyphenTel_(this.value);
+    var diff = this.value.length - before;
+    try{ this.setSelectionRange(s+diff, s+diff); }catch(e){}
+  });
+  el.addEventListener('blur', function(){ this.value = hyphenTel_(this.value); });
+}
+bindTel_('f-phone');
+
 /* 신청 폼 */
 const GAS_URL='https://script.google.com/macros/s/AKfycbyeDyAWy_8YOzmC5eYTcPz0tqytjEmQzG5aKiOQCyHx12cRP-pw_-ee5_TZmoDsydjV/exec';   /* 클린프차 통합 접수 엔드포인트 · sheet 값으로 시트 분기 */
 
